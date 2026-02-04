@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Valentine</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      background: linear-gradient(135deg, #ffb6c1, #ff8fb7);
+      overflow: hidden;
+      text-align: center;
+      color: white;
+    }
+
+    h1 {
+      margin-top: 28vh;
+      font-size: 2rem;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+      padding: 0 14px;
+      line-height: 1.25;
+      transition: 0.3s ease;
+    }
+
+    /* Heartbeat animation for YES message */
+    .heartbeat {
+      animation: heartbeat 1.1s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%   { transform: scale(1); }
+      20%  { transform: scale(1.05); }
+      40%  { transform: scale(1); }
+      60%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    #buttons {
+      margin-top: 30px;
+      position: relative;
+      z-index: 5;
+    }
+
+    button {
+      background: #ff4d94;
+      border: none;
+      padding: 15px 30px;
+      margin: 10px;
+      font-size: 1.1rem;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      background: #ff1a78;
+      transform: scale(1.05);
+    }
+
+    /* Floating emoji styles */
+    .emoji, .flower, .confetti {
+      position: absolute;
+      font-size: 40px;
+      animation: floatUp 2.8s ease-out forwards;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-320px) scale(1.6) rotate(30deg); }
+    }
+
+    /* Confetti drop */
+    .confetti {
+      font-size: 22px;
+      animation: confettiFall 2.4s ease-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0%   { opacity: 1; transform: translateY(-40px) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(520px) rotate(360deg) scale(1.2); }
+    }
+
+    /* Cute corner heart */
+    #cornerHeart {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      font-size: 32px;
+      opacity: 0.85;
+      animation: cornerFloat 2.6s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    @keyframes cornerFloat {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="cornerHeart">💗</div>
+
+  <h1 id="mainText">Do you want to be my Valentine?</h1>
+
+  <div id="buttons">
+    <button id="yes">YES</button>
+    <button id="no">NO 😢</button>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yes");
+    const noBtn = document.getElementById("no");
+    const mainText = document.getElementById("mainText");
+    const buttons = document.getElementById("buttons");
+
+    // Cute pop sound (no file needed)
+    function playPopSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.value = 660;
+
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      } catch (e) {
+        // sound blocked sometimes on mobile until user interacts
+      }
+    }
+
+    // Add floating items (hearts + flowers)
+    function addFloating(symbol, count) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        document.body.appendChild(el);
+
+        el.className = (symbol === "💐") ? "flower" : "emoji";
+        el.innerText = symbol;
+
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.top = (55 + Math.random() * 35) + "vh"; // start lower
+        el.style.fontSize = (26 + Math.random() * 28) + "px";
+
+        setTimeout(() => el.remove(), 3000);
+      }
+    }
+
+    // Confetti burst
+    function addConfetti(count) {
+      const confettiSymbols = ["🎊", "✨", "🎉", "💛", "💙", "💖", "💚", "💜"];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        document.body.appendChild(el);
+
+        el.className = "confetti";
+        el.innerText = confettiSymbols[Math.floor(Math.random() * confettiSymbols.length)];
+
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.top = "-10px";
+        el.style.fontSize = (16 + Math.random() * 18) + "px";
+
+        setTimeout(() => el.remove(), 2600);
+      }
+    }
+
+    // YES CLICK
+    function yesClick() {
+      playPopSound();
+
+      mainText.innerText =
+        "Yaaayyyy Pumpkin, finally a YES, YOURE OFFICIALLY MY VALENTINE. LOVE YOU 😘❣️❣️";
+
+      mainText.classList.add("heartbeat");
+      buttons.style.display = "none";
+
+      // Big celebration
+      addConfetti(40);
+      addFloating("💐", 14);
+      addFloating("💖", 18);
+      addFloating("😍", 10);
+      addFloating("💘", 10);
+
+      // Second message after 2 seconds
+      setTimeout(() => {
+        mainText.innerText = "Now come here… 😌💋";
+      }, 2000);
+
+      // Keep hearts floating every 800ms for a short time
+      let loops = 0;
+      const interval = setInterval(() => {
+        addFloating("💖", 6);
+        loops++;
+        if (loops >= 6) clearInterval(interval);
+      }, 800);
+    }
+
+    // NO button runs away + changes text
+    let noMoves = 0;
+    const noTexts = [
+      "NO 😢",
+      "Are you sure? 😭",
+      "Pleaseeee 🥺",
+      "Don’t do this 😭💔",
+      "Last chance 😳",
+      "Okay fine 😞"
+    ];
+
+    function moveNoButton() {
+      noMoves++;
+      noBtn.innerText = noTexts[Math.min(noMoves, noTexts.length - 1)];
+
+      const x = Math.random() * 70 + 10; // keep inside screen
+      const y = Math.random() * 60 + 20;
+
+      noBtn.style.position = "absolute";
+      noBtn.style.left = x + "vw";
+      noBtn.style.top = y + "vh";
+      noBtn.style.transform = "scale(0.95)";
+
+      // small hearts appear when NO tries to run
+      addFloating("💔", 3);
+
+      // After too many tries, auto force YES 😭😂
+      if (noMoves >= 6) {
+        mainText.innerText = "You’re too cute to say no 😭💘";
+        setTimeout(yesClick, 900);
+      }
+    }
+
+    // EVENTS
+    yesBtn.addEventListener("click", yesClick);
+
+    // NO runs away on hover (desktop) + click (mobile)
+    noBtn.addEventListener("mouseover", moveNoButton);
+    noBtn.addEventListener("click", moveNoButton);
+  </script>
+
+</body>
+</html>
